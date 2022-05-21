@@ -1,0 +1,37 @@
+%% chebyshev filter
+clc ; clear ;
+wp = input("enter in rad/sec:");
+ws = input("enter rad/sec:");
+rp = input("enter ripple:");
+rs = input("enter ripple:");
+%wp = 50;
+%ws = 100;
+%rp = 0.02;
+%rs = 0.01;
+lwp = length(wp);
+[n,wn] = cheb1ord(wp,ws,rp,rs,'s');
+if lwp == 1
+    if wp<ws
+        disp('low pass')
+        [b,a] = cheb1 (n,wn,'low','s');
+        w = 0:1:(2* max(wp,ws));
+    else
+        disp ('high pass')
+        [b,a] = cheb1(n,wn,'high','s');
+        w = 0:1:(2* max(wp,ws));
+    end
+else
+    if wp(1)>ws(1)
+        disp('band pass')  
+        [b,a] = cheb1 (n,wn,'pass','s');   
+        w = 0:1:(2* max(wp(1),ws(1)));
+    else
+        disp('band stop')
+        [b,a] = cheb1(n,wn,'stop','s');
+        w = 0:1:(2* max(wp(1),ws(1)));
+    end
+end
+h = freqs(b,a,w);
+mag = 20*log(abs(h));
+plot (w,mag)
+[z p k ] = cheb1ap(n);

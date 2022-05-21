@@ -1,0 +1,300 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>firfilter</title><meta name="generator" content="MATLAB 9.10"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-05-09"><meta name="DC.source" content="firfilter.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%General FIR filter method</span>
+clc
+clear
+<span class="comment">%wp= input("Enter the value of passband cut off frequencies: ");</span>
+<span class="comment">%ws= input("Enter the value of stopband cut off Frequencies: ");</span>
+wp= [0.3*pi 0.7*pi];
+ws= [0.2*pi 0.8*pi];
+<span class="comment">%delp= input("Enter the value of passband ripple: ");</span>
+<span class="comment">%dels= input("Enter the value of stopband ripple: ");</span>
+delp = 0.02;
+dels = 0.05;
+<span class="comment">%fs=input("Enter the value of sampling frequency:"); %sampling frequency</span>
+fs=1;
+wp = wp/fs;
+ws=ws/fs;
+
+lfs= length(ws);
+lfp= length(wp);
+
+<span class="comment">%stepl decide which window to use</span>
+<span class="comment">% AS=input("Enter the value As (Above 44 Lo hamming windowi between 21</span>
+<span class="comment">% and 44 for hanning window; below 21 for rectangular window):");</span>
+<span class="comment">%As= 44;</span>
+As = -20*log(dels);
+tw=abs(wp(1)-ws(1)); <span class="comment">%transition width (abs:taking positive values)</span>
+<span class="comment">%For more than one ripple</span>
+<span class="comment">%use tw1 &amp; tw2 and find max and min respectively</span>
+
+<span class="keyword">if</span> As&lt;=21
+    disp(<span class="string">'Rectangular window'</span>)
+    wn=@(n)(1);
+    N=ceil((4*pi/tw) -1); <span class="comment">% nearest next number(4.33 to 5)</span>
+    <span class="keyword">if</span> (rem(N,2)==0) <span class="comment">% N even</span>
+        N=N+1;
+    <span class="keyword">end</span>
+ <span class="keyword">elseif</span> As&gt;21 &amp;&amp; As&lt;44
+     disp(<span class="string">'Hanning window'</span>)
+     N=ceil(8*pi/tw);
+     <span class="keyword">if</span> (rem (N,2)==0)
+         N=N+1;
+     <span class="keyword">end</span>
+     wn=@(n)(0.5*(1-cos(2*pi*n/(N-1)))); <span class="comment">% n is a variable</span>
+<span class="keyword">elseif</span> As&gt;=44
+    disp(<span class="string">'Hamming window'</span>)
+    N=ceil(8*pi/tw);
+    <span class="keyword">if</span> (rem (N,2)==0)
+        N=N+1;
+    <span class="keyword">end</span>
+    wn=@(n)(0.54-0.46*cos(2*pi-n/(N-1)));
+<span class="keyword">end</span>
+
+tao=(N-1)/2;
+
+<span class="comment">% step2 decide basic filters and obtain h(n) expression</span>
+hd=@(w,n)((1/(2*pi))*exp(-w*tao*i)*exp(w*n*i));
+
+<span class="keyword">if</span> lfp==1 &amp;&amp; lfs==1
+    <span class="keyword">if</span> wp&gt;ws
+        disp(<span class="string">'High pass filter'</span>)
+        wc= (wp+ws)/2;
+        syms <span class="string">w</span> <span class="string">n</span> <span class="string">z</span> ; <span class="comment">% symbol declaration</span>
+        <span class="keyword">for</span> n=0:1:N-1
+            <span class="comment">%integration wrt w linit -pi to -wc</span>
+            hnd= int(hd(w,n), <span class="string">'w'</span>,-pi, -wc) + int(hd(w,n), <span class="string">'w'</span> , wc, pi);
+            hd2=double(hnd); <span class="comment">%double will display value</span>
+            hn(n+1)=hd2*wn(n);
+        <span class="keyword">end</span>
+        hn
+        m = 0:1:N-1;
+        stem (m, hn)
+    <span class="keyword">else</span>
+        disp(<span class="string">'low pass filter'</span>)
+        wc= (wp+ws)/2;
+        syms <span class="string">w</span> <span class="string">n</span> <span class="string">z</span>;
+        <span class="keyword">for</span> n=0:1:N-1
+            hnd= int(hd(w,n), <span class="string">'w'</span>, -wc, wc);
+            hd2=double(hnd);
+            hn(n+1)=hd2*wn(n);
+        <span class="keyword">end</span>
+        hn;
+        m=0:1:N-1;
+        stem(m,hn)
+    <span class="keyword">end</span>
+<span class="keyword">elseif</span> lfp==2 &amp;&amp; lfs==2
+    <span class="keyword">if</span> wp(1)&gt;ws(1)
+        disp(<span class="string">'Band pass filter'</span>)
+        wc1= (wp(1)+ws(1))/2;
+        wc2= (wp(2)+ws(2)) /2;
+        syms <span class="string">w</span> <span class="string">n</span> <span class="string">z</span>
+        <span class="keyword">for</span> n=0:1:N-1
+            hnd= int(hd(w,n),<span class="string">'w'</span>,-wc2, -wc1) + int(hd(w,n), <span class="string">'w'</span>, wc1, wc2);
+            hd2=double(hnd);
+            hn(n+1) =hd2*wn(n);
+        <span class="keyword">end</span>
+        hn;
+        m=0:1:N-1;
+        stem (m, hn)
+    <span class="keyword">else</span>
+        disp(<span class="string">'Band stop filter'</span>)
+        wc1=(wp(1) +ws(1))/2;
+        wc2= (wp(2) +ws(2))/2;
+        syms <span class="string">w</span> <span class="string">n</span> <span class="string">z</span>
+        <span class="keyword">for</span> n= 0:1: N-1
+            hnd= int(hd(w,n),<span class="string">'w'</span>,-pi,-wc2) +int(hd(w,n),<span class="string">'w'</span>,-wc1, wc1) +int(hd(w,n),<span class="string">'w'</span>, wc2, pi);
+            hd2=double(hnd);
+            hn(n+1)=hd2*wn(n);
+        <span class="keyword">end</span>
+        hn;
+        m=0:1:N-1;
+        stem(m,hn)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Hamming window
+Band pass filter
+</pre><img vspace="5" hspace="5" src="firfilter_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%General FIR filter method
+clc 
+clear 
+%wp= input("Enter the value of passband cut off frequencies: ");
+%ws= input("Enter the value of stopband cut off Frequencies: ");
+wp= [0.3*pi 0.7*pi]; 
+ws= [0.2*pi 0.8*pi];
+%delp= input("Enter the value of passband ripple: ");
+%dels= input("Enter the value of stopband ripple: ");
+delp = 0.02;
+dels = 0.05;
+%fs=input("Enter the value of sampling frequency:"); %sampling frequency
+fs=1;
+wp = wp/fs;
+ws=ws/fs;
+
+lfs= length(ws);
+lfp= length(wp);
+
+%stepl decide which window to use 
+% AS=input("Enter the value As (Above 44 Lo hamming windowi between 21 
+% and 44 for hanning window; below 21 for rectangular window):");
+%As= 44; 
+As = -20*log(dels);
+tw=abs(wp(1)-ws(1)); %transition width (abs:taking positive values)
+%For more than one ripple
+%use tw1 & tw2 and find max and min respectively
+
+if As<=21
+    disp('Rectangular window') 
+    wn=@(n)(1); 
+    N=ceil((4*pi/tw) -1); % nearest next number(4.33 to 5)
+    if (rem(N,2)==0) % N even
+        N=N+1;
+    end
+ elseif As>21 && As<44
+     disp('Hanning window')
+     N=ceil(8*pi/tw); 
+     if (rem (N,2)==0)
+         N=N+1; 
+     end 
+     wn=@(n)(0.5*(1-cos(2*pi*n/(N-1)))); % n is a variable
+elseif As>=44
+    disp('Hamming window')
+    N=ceil(8*pi/tw); 
+    if (rem (N,2)==0)
+        N=N+1; 
+    end 
+    wn=@(n)(0.54-0.46*cos(2*pi-n/(N-1)));
+end
+
+tao=(N-1)/2;
+
+% step2 decide basic filters and obtain h(n) expression
+hd=@(w,n)((1/(2*pi))*exp(-w*tao*i)*exp(w*n*i));
+
+if lfp==1 && lfs==1 
+    if wp>ws
+        disp('High pass filter') 
+        wc= (wp+ws)/2; 
+        syms w n z ; % symbol declaration
+        for n=0:1:N-1
+            %integration wrt w linit -pi to -wc
+            hnd= int(hd(w,n), 'w',-pi, -wc) + int(hd(w,n), 'w' , wc, pi); 
+            hd2=double(hnd); %double will display value
+            hn(n+1)=hd2*wn(n); 
+        end
+        hn
+        m = 0:1:N-1;
+        stem (m, hn) 
+    else
+        disp('low pass filter')
+        wc= (wp+ws)/2; 
+        syms w n z;
+        for n=0:1:N-1
+            hnd= int(hd(w,n), 'w', -wc, wc); 
+            hd2=double(hnd);
+            hn(n+1)=hd2*wn(n);
+        end 
+        hn;
+        m=0:1:N-1;
+        stem(m,hn)
+    end
+elseif lfp==2 && lfs==2 
+    if wp(1)>ws(1)
+        disp('Band pass filter') 
+        wc1= (wp(1)+ws(1))/2;
+        wc2= (wp(2)+ws(2)) /2;
+        syms w n z 
+        for n=0:1:N-1
+            hnd= int(hd(w,n),'w',-wc2, -wc1) + int(hd(w,n), 'w', wc1, wc2); 
+            hd2=double(hnd);
+            hn(n+1) =hd2*wn(n); 
+        end 
+        hn; 
+        m=0:1:N-1;
+        stem (m, hn) 
+    else
+        disp('Band stop filter') 
+        wc1=(wp(1) +ws(1))/2;
+        wc2= (wp(2) +ws(2))/2; 
+        syms w n z 
+        for n= 0:1: N-1
+            hnd= int(hd(w,n),'w',-pi,-wc2) +int(hd(w,n),'w',-wc1, wc1) +int(hd(w,n),'w', wc2, pi);
+            hd2=double(hnd); 
+            hn(n+1)=hd2*wn(n);
+        end
+        hn; 
+        m=0:1:N-1; 
+        stem(m,hn)
+    end
+end
+
+##### SOURCE END #####
+--></body></html>
