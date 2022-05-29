@@ -1,22 +1,40 @@
-%overlap save
-clear
-clc
-x = [1 2 1 3 4 -1 -1 -2 -4 -1 -2 3 2 1 5 6 8 -6];
-h= [1 -1 1];
-
-lx = length(x);
-M = length(h);
-L =7;
-N= L-M+1;
-
-r = rem(lx,N);
-x = [x zeros(1 ,(N-r))];
-h = [h zeros(1 ,(L-M) )];
-
-x1 = [zeros(1 ,M-1) x(1:N)];
-for i= 1:length(x)/N-1
-    x2(i,:) = ((i*N)-M+1: (i+1)*N)
-    y2(i,:) = cconv(x2(i,:),h,L)
+clc;
+clear all;
+close all;
+x = [2 -2 8 -2 -2 -3 -2 1 -1 9 1 3];
+h= [1 2 3];
+N=4
+% Code to plot X(n)
+subplot(2,2,1);
+stem(x,'blue');
+xlabel ('n---->');
+ylabel ('Amplitude ---->');
+title('X(n)');
+%Code to plot H(n)
+subplot(2,2,2);
+stem(h,'black');
+xlabel ('n---->');
+ylabel ('Amplitude ---->');
+title(' H(n)');
+% Code to perform Convolution using Overlap Save Method
+lx=length(x);
+1
+lh=length(h);
+m=lh-1;
+x=[zeros(1,m) x zeros(1,N)];
+h=[h zeros(1,N-lh)];
+L=N-lh+1;
+k=floor((length(h))/L);
+for i=0:k
+y=x(1,i*L+1:i*L+N);
+q=cconv(y,h); %Call the mycirconv1 function.
+p(i+1,:)=q;
 end
-y3= [cconv(x1,h,L);y2]
-y = [y3(1,(M:L)) y3(2,(M:L)) y3(3,(M:L)) y3(4,(M:N))]
+p1=p(:,lh:N)';
+p=p1(:)'
+% Representation of the Convoled Signal
+subplot(2,2,3:4);
+stem(p,'red');
+xlabel ('n---->');
+ylabel ('Amplitude ---->');
+title('Convoled Signal');
